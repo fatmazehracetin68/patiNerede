@@ -13,10 +13,12 @@ const Header = () => {
   ];
 
   return (
-    <div className="flex flex-col bg-[#859F3D]">
+    <div className="fixed top-0 left-0 w-full z-50 bg-[#859F3D] shadow-md ">
       <div className="flex flex-row bg-[#1A1A19] p-4 justify-around items-center mt-10">
         <div className="bg-[#F6FCDF] p-3 rounded-xl">
-          <h1 className="text-xl font-bold">patiNerede</h1>
+          <h1 className="text-xl font-bold cursor-pointer" onClick={() => navigate("/home")}>
+            patiNerede
+          </h1>
         </div>
 
         <div className="hidden md:flex space-x-6">

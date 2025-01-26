@@ -15,7 +15,7 @@ const LostAnimals = () => {
     { id: 4, name: "Luna", location: "Bursa", image: dumanCat },
   ];
   return (
-    <div className="bg-[#EDE8DC] my-10 p-5">
+    <div className="bg-[#EDE8DC] my-10 p-5 ">
       <div className=" w-[80%] justify-center items-center mx-auto">
         <div>
           <h2 className="text-[#ff8a65] text-3xl text-bold text-center">KAYIP HAYVANLAR</h2>
