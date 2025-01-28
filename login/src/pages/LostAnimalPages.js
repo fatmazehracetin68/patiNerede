@@ -1,47 +1,83 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import AnimalCard from "../components/AnimalCard";
+import ExampleLostAnimals from "../components/ExampleLostAnimals";
 
 const KayıpSayfası = () => {
-  const [kayiplar, setKayiplar] = useState([]);
+  const [lost, setLost] = useState([]);
+  const [selectedAnimal, setSelectedAnimal] = useState(null); // Modal için seçilen ilan
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     // localStorage'dan kaybolan ilanları al
-    const savedKayiplar = JSON.parse(localStorage.getItem("kayipIlanlari")) || [];
-    setKayiplar(savedKayiplar);
+    const savedLost = JSON.parse(localStorage.getItem("kayipIlanlari")) || [];
+    setLost(savedLost);
   }, []);
 
   return (
-    <div className="p-4">
-      <h2 className="text-[#31511E] text-xl my-5 text-center">Kayıp İlanları</h2>
-
-      {kayiplar.length > 0 ? (
+    <div className="p-4 mt-28 mx-28">
+      <ExampleLostAnimals />
+      {lost.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {kayiplar.map((ilan, index) => (
-            <div key={index} className="border p-4 rounded-md shadow-md">
-              <h3 className="font-bold text-lg">{ilan.ilanBasligi}</h3>
-              <p className="text-gray-600">Hayvan İsmi: {ilan.hayvanIsmi}</p>
-              <p className="text-gray-600">Cinsiyet: {ilan.cinsiyet}</p>
-              <p className="text-gray-600">Tür: {ilan.turu}</p>
-              <p className="text-gray-600">Kaybolduğu İl: {ilan.kaybolduguIl}</p>
-              <p className="text-gray-600">Kayıp Tarihi: {ilan.kayipTarihi}</p>
-              <p className="text-gray-600">Açıklama: {ilan.ilanAciklamasi}</p>
-              <div className="mt-4">
-                {ilan.resim && (
-                  <img
-                    src={ilan.resim}
-                    alt="İlan Resmi"
-                    className="w-[50%] h-40 object-cover rounded-md"
-                  />
-                )}
-              </div>
-              <Link to="/" className="mt-4 block text-center text-[#ff8a65] font-bold">
-                Detaylar
-              </Link>
+          {lost.map((ilan, index) => (
+            <div
+              key={index}
+              onClick={() => {
+                setSelectedAnimal(ilan);
+                setIsModalOpen(true);
+              }}
+            >
+              <AnimalCard
+                animal={{
+                  image: ilan.resim,
+                  name: ilan.hayvanIsmi,
+                  location: ilan.kaybolduguIl,
+                }}
+              />
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-center text-gray-500">Henüz kayıp ilanı bulunmamaktadır.</p>
+        <p className="text-center text-gray-500"></p>
+      )}
+
+      {isModalOpen && selectedAnimal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md relative">
+            <button
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+              onClick={() => setIsModalOpen(false)}
+            >
+              ✖
+            </button>
+
+            <img
+              src={selectedAnimal.resim}
+              alt={selectedAnimal.hayvanIsmi}
+              className="w-full h-40 object-cover rounded-md"
+            />
+            <h3 className="text-2xl font-bold text-center mt-2">{selectedAnimal.ilanBasligi}</h3>
+            <div className="mt-4 text-gray-700 space-y-2">
+              <p>
+                <strong>Hayvan İsmi:</strong> {selectedAnimal.hayvanIsmi}
+              </p>
+              <p>
+                <strong>Cinsiyet:</strong> {selectedAnimal.cinsiyet}
+              </p>
+              <p>
+                <strong>Tür:</strong> {selectedAnimal.turu}
+              </p>
+              <p>
+                <strong>Kaybolduğu İl:</strong> {selectedAnimal.kaybolduguIl}
+              </p>
+              <p>
+                <strong>Kayıp Tarihi:</strong> {selectedAnimal.kayipTarihi}
+              </p>
+              <p>
+                <strong>Açıklama:</strong> {selectedAnimal.ilanAciklamasi}
+              </p>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

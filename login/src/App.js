@@ -6,6 +6,7 @@ import FindingAnimalForm from "./pages/FindingAnimalForm";
 import LostAnimalPages from "./pages/LostAnimalPages";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import FoundAnimals from "./pages/FoundAnimals";
 
 export const App = () => {
   return (
@@ -16,6 +17,7 @@ export const App = () => {
         <Route path="/form-lost-animal" element={<FormLostAnimal />} />
         <Route path="/finding-animal-form" element={<FindingAnimalForm />} />
         <Route path="/lost-animals" element={<LostAnimalPages />} />
+        <Route path="/found-animals" element={<FoundAnimals />} />
       </Routes>
       <Footer />
     </Router>

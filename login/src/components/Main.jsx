@@ -1,5 +1,6 @@
 import React from "react";
 import catImage from "../assest/images.jpeg";
+import { Pet } from "iconsax-react";
 
 const Main = () => {
   return (
@@ -19,15 +20,16 @@ const Main = () => {
           sağlamaya çalışıyoruz.
         </p>
         <h1 className="font-bold my-5">Ne yapabilirsiniz?</h1>
-        <div className="flex items-start space-x-2">
-          <span className="text-green-500 text-xl">✓</span>
+        <div className="flex items-start space-x-2 ">
+          <Pet size="28" color="#37d67a" />
+
           <p className="text-lg text-[#333]">
             Kaybolan bir dostunuz varsa, burada kaybolan hayvanın bilgilerini girerek diğer
             kullanıcıların bu konuda size yardımcı olmasına olanak tanıyabilirsiniz.
           </p>
         </div>
-        <div className="flex items-start space-x-2">
-          <span className="text-green-500 text-xl">✓</span>
+        <div className="flex items-start space-x-2 mt-5">
+          <Pet size="28" color="#37d67a" />
           <p className="text-lg text-[#333]">
             Eğer bir kayıp hayvan bulduysanız, bu bölüme kaybolan hayvan hakkında bilgileri
             ekleyerek sahibine geri dönmesi için yardımcı olabilirsiniz.

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const Form = () => {
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [formData, setFormData] = useState({
     ilanBasligi: "",
@@ -35,8 +36,11 @@ const Form = () => {
     // Önceki ilanları al, yeni ilanı ekle
     const existingData = JSON.parse(localStorage.getItem("kayipIlanlari")) || [];
     localStorage.setItem("kayipIlanlari", JSON.stringify([...existingData, formData]));
-
-    navigate("/kayiplar"); // Kayıp sayfasına yönlendir
+    setShowModal(true);
+    setTimeout(() => {
+      setShowModal(false);
+      navigate("/kayiplar");
+    }, 5000);
   };
 
   const citys = [
@@ -119,6 +123,7 @@ const Form = () => {
     "Yozgat",
     "Zonguldak",
   ];
+
   return (
     <div>
       <h2 className="text-[#31511E] text-xl my-5 text-center">TEMEL BİLGİLER</h2>
@@ -282,6 +287,23 @@ const Form = () => {
           KAYDET
         </button>
       </form>
+
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-5 rounded-lg shadow-lg w-80 text-center">
+            <h2 className="text-xl font-bold text-green-600">Başarıyla Kaydedildi!</h2>
+            <p className="text-gray-600 mt-2">İlanınız başarıyla kaydedildi.</p>
+            <button
+              onClick={() => {
+                navigate("/kayiplar");
+              }}
+              className="mt-4 bg-[#ff8a65] text-white px-4 py-2 rounded-md"
+            >
+              Tamam
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
