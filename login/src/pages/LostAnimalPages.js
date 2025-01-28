@@ -4,8 +4,18 @@ import ExampleLostAnimals from "../components/ExampleLostAnimals";
 
 const KayıpSayfası = () => {
   const [lost, setLost] = useState([]);
-  const [selectedAnimal, setSelectedAnimal] = useState(null); // Modal için seçilen ilan
+  const [selectedAnimal, setSelectedAnimal] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = (animal) => {
+    setSelectedAnimal(animal);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedAnimal(null);
+  };
 
   useEffect(() => {
     // localStorage'dan kaybolan ilanları al
@@ -15,7 +25,7 @@ const KayıpSayfası = () => {
 
   return (
     <div className="p-4 mt-28 mx-28">
-      <ExampleLostAnimals />
+      <ExampleLostAnimals openModal={openModal} closeModal={closeModal} />
       {lost.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {lost.map((ilan, index) => (

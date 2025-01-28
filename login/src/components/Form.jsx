@@ -1,10 +1,37 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import * as yup from "yup";
 
 const Form = () => {
+  const schema = yup.object().shape({
+    ilanBasligi: yup.string().required("İlan başlığı zorunludur"),
+    kaybolduguIl: yup.string().required("Kaybolduğu il  zorunludur"),
+    hayvanIsmi: yup.string().required("Hayvan ismi zorunludur"),
+    telefon: yup
+      .string()
+      .matches(/^[0-9]{10}$/, "Geçerli bir telefon numarası girin")
+      .required("Telefon numarası zorunludur"),
+    ad: yup.string().required("İsminizi yazınız"),
+    soyad: yup.string().required("Soyadınızı yazınız"),
+    turu: yup.string().required("Tür seçimi zorunludur"),
+  });
+
+  const [formErrors, setFormErrors] = useState({
+    ilanBasligi: "",
+    kaybolduguIl: "",
+    hayvanIsmi: "",
+    telefon: "",
+    ad: "",
+    soyad: "",
+    turu: "",
+  });
+
   const navigate = useNavigate();
+
   const [showModal, setShowModal] = useState(false);
+
   const [selectedImage, setSelectedImage] = useState(null);
+
   const [formData, setFormData] = useState({
     ilanBasligi: "",
     hayvanIsmi: "",
@@ -22,6 +49,7 @@ const Form = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -30,17 +58,33 @@ const Form = () => {
       setFormData({ ...formData, resim: imageUrl });
     }
   };
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Önceki ilanları al, yeni ilanı ekle
-    const existingData = JSON.parse(localStorage.getItem("kayipIlanlari")) || [];
-    localStorage.setItem("kayipIlanlari", JSON.stringify([...existingData, formData]));
-    setShowModal(true);
-    setTimeout(() => {
-      setShowModal(false);
-      navigate("/kayiplar");
-    }, 5000);
+    const newFormErrors = {}; // Yeni bir nesne oluşturuyoruz
+
+    try {
+      // Form verilerini doğrula
+      await schema.validate(formData, { abortEarly: false });
+
+      // Önceki ilanları al, yeni ilanı ekle
+      const existingData = JSON.parse(localStorage.getItem("kayipIlanlari")) || [];
+      localStorage.setItem("kayipIlanlari", JSON.stringify([...existingData, formData]));
+
+      setShowModal(true);
+      setTimeout(() => {
+        setShowModal(false);
+        navigate("/kayiplar");
+      }, 5000);
+    } catch (err) {
+      // Hataları nesne olarak al
+      err.inner.forEach((error) => {
+        newFormErrors[error.path] = error.message; // Hata mesajlarını formErrors'a ekliyoruz
+      });
+
+      setFormErrors(newFormErrors); // Yeni hataları state'e set ediyoruz
+    }
   };
 
   const citys = [
@@ -137,15 +181,24 @@ const Form = () => {
               className="p-2 border-2 rounded-md"
               type="text"
             />
+            {formErrors.ilanBasligi && (
+              <p className="text-red-500 text-sm">{formErrors.ilanBasligi}</p>
+            )}
           </div>
+
           <div className="flex flex-col w-[80%]">
             <label className="font-bold my-2">Hayvan İsmi</label>
             <input
-              name="hayvanIsmi"
-              onChange={handleChange}
-              className="p-2 border-2 rounded-md"
               type="text"
+              name="hayvanIsmi"
+              value={formData.hayvanIsmi}
+              onChange={handleChange}
+              placeholder="Hayvan ismi"
+              className="p-2 border-2 rounded-md"
             />
+            {formErrors.hayvanIsmi && (
+              <p className="text-red-500 text-sm">{formErrors.hayvanIsmi}</p>
+            )}
           </div>
 
           <div className="flex flex-col w-[80%] mt-4">
@@ -158,7 +211,7 @@ const Form = () => {
                   value="dişi"
                   onChange={handleChange}
                   className="mr-2"
-                />{" "}
+                />
                 Dişi
               </label>
               <label>
@@ -168,7 +221,7 @@ const Form = () => {
                   value="erkek"
                   onChange={handleChange}
                   className="mr-2"
-                />{" "}
+                />
                 Erkek
               </label>
             </div>
@@ -187,11 +240,13 @@ const Form = () => {
           <div className="flex flex-col w-[80%] mt-4">
             <label className="font-bold mb-2">Türü</label>
             <select name="turu" onChange={handleChange} className="border-2 rounded-md">
+              <option value="">Seçiniz</option>
               <option value="kedi">Kedi</option>
               <option value="köpek">Köpek</option>
               <option value="kanatlı">Kanatlı</option>
               <option value="diğer">Diğer</option>
             </select>
+            {formErrors.turu && <p className="text-red-500 text-sm">{formErrors.turu}</p>}
           </div>
 
           <div className="flex flex-col w-[80%]">
@@ -258,29 +313,38 @@ const Form = () => {
         <div className="flex flex-col w-[80%]">
           <label className="font-bold my-2">Adınız</label>
           <input
-            name="ad"
-            onChange={handleChange}
-            className="p-2 border-2 rounded-md"
             type="text"
+            name="ad"
+            value={formData.ad}
+            onChange={handleChange}
+            placeholder="Adınız"
+            className="p-2 border-2 rounded-md"
           />
+          {formErrors.ad && <p className="text-red-500 text-sm">{formErrors.ad}</p>}
         </div>
         <div className="flex flex-col w-[80%]">
           <label className="font-bold my-2">Soyadınız</label>
           <input
-            name="soyad"
-            onChange={handleChange}
-            className="p-2 border-2 rounded-md"
             type="text"
+            name="soyad"
+            value={formData.soyad}
+            onChange={handleChange}
+            placeholder="Soyadınız"
+            className="p-2 border-2 rounded-md"
           />
+          {formErrors.soyad && <p className="text-red-500 text-sm">{formErrors.soyad}</p>}
         </div>
         <div className="flex flex-col w-[80%]">
-          <label className="font-bold my-2">Telefon Numaranız</label>
+          <label className="font-bold my-2">Telefon</label>
           <input
+            type="text"
             name="telefon"
+            value={formData.telefon}
             onChange={handleChange}
+            placeholder="Telefon Numaranızı Giriniz"
             className="p-2 border-2 rounded-md"
-            type="tel"
           />
+          {formErrors.telefon && <p className="text-red-500 text-sm">{formErrors.telefon}</p>}
         </div>
 
         <button type="submit" className="w-100 h-10 mt-5 p-2 rounded-md bg-[#ff8a65] text-white">
@@ -302,6 +366,15 @@ const Form = () => {
               Tamam
             </button>
           </div>
+        </div>
+      )}
+      {formErrors.length > 0 && (
+        <div className="text-red-500 mt-2">
+          <ul>
+            {formErrors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
