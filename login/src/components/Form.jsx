@@ -1,15 +1,100 @@
 import React, { useState } from "react";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../firebase";
+import { getApp } from "firebase/app";
+
+const citys = [
+  "Adana",
+  "Adıyaman",
+  "Afyonkarahisar",
+  "Aksaray",
+  "Amasya",
+  "Ankara",
+  "Antalya",
+  "Ardahan",
+  "Artvin",
+  "Aydın",
+  "Balıkesir",
+  "Bartın",
+  "Batman",
+  "Bayburt",
+  "Bilecik",
+  "Bingöl",
+  "Bitlis",
+  "Bolu",
+  "Burdur",
+  "Bursa",
+  "Çanakkale",
+  "Çankırı",
+  "Çorum",
+  "Denizli",
+  "Diyarbakır",
+  "Düzce",
+  "Edirne",
+  "Elazığ",
+  "Erzincan",
+  "Erzurum",
+  "Eskişehir",
+  "Gaziantep",
+  "Giresun",
+  "Gümüşhane",
+  "Hakkâri",
+  "Hatay",
+  "Iğdır",
+  "Isparta",
+  "İstanbul",
+  "İzmir",
+  "Kahramanmaraş",
+  "Karabük",
+  "Karaman",
+  "Kastamonu",
+  "Kayseri",
+  "Kırıkkale",
+  "Kırklareli",
+  "Kırşehir",
+  "Kocaeli",
+  "Konya",
+  "Kütahya",
+  "Malatya",
+  "Manisa",
+  "Mardin",
+  "Mersin",
+  "Muğla",
+  "Muş",
+  "Nevşehir",
+  "Niğde",
+  "Ordu",
+  "Osmaniye",
+  "Rize",
+  "Sakarya",
+  "Samsun",
+  "Siirt",
+  "Sinop",
+  "Sivas",
+  "Şanlıurfa",
+  "Şırnak",
+  "Tekirdağ",
+  "Tokat",
+  "Trabzon",
+  "Tunceli",
+  "Uşak",
+  "Van",
+  "Yalova",
+  "Yozgat",
+  "Zonguldak",
+];
 
 const Form = () => {
   const schema = yup.object().shape({
     ilanBasligi: yup.string().required("İlan başlığı zorunludur"),
-    kaybolduguIl: yup.string().required("Kaybolduğu il  zorunludur"),
+    kaybolduguIl: yup.string().required("Kaybolduğu il zorunludur"),
     hayvanIsmi: yup.string().required("Hayvan ismi zorunludur"),
     telefon: yup
       .string()
-      .matches(/^[0-9]{10}$/, "Geçerli bir telefon numarası girin")
+      .matches(/^[0-9]{11}$/, "Geçerli bir telefon numarası girin")
       .required("Telefon numarası zorunludur"),
     ad: yup.string().required("İsminizi yazınız"),
     soyad: yup.string().required("Soyadınızı yazınız"),
@@ -18,9 +103,9 @@ const Form = () => {
 
   const [formErrors, setFormErrors] = useState({
     ilanBasligi: "",
-    kaybolduguIl: "",
     hayvanIsmi: "",
     telefon: "",
+    kaybolduguIl: "",
     ad: "",
     soyad: "",
     turu: "",
@@ -46,127 +131,72 @@ const Form = () => {
     soyad: "",
     telefon: "",
   });
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (event) => {
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result); // Base64 string döner
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleImageChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
-      setFormData({ ...formData, resim: imageUrl });
+      setSelectedImage(URL.createObjectURL(file)); // Önizleme için
+      const base64String = await convertToBase64(file); // Resmi Base64 formatına dönüştür
+      setFormData({ ...formData, resim: base64String }); // Base64 string'i formData'ya kaydet
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newFormErrors = {}; // Yeni bir nesne oluşturuyoruz
-
     try {
       // Form verilerini doğrula
       await schema.validate(formData, { abortEarly: false });
 
-      // Önceki ilanları al, yeni ilanı ekle
-      const existingData = JSON.parse(localStorage.getItem("kayipIlanlari")) || [];
-      localStorage.setItem("kayipIlanlari", JSON.stringify([...existingData, formData]));
+      // Firestore'a kaydet
+      const docRef = await addDoc(collection(db, "kayipIlanlari"), {
+        ilanBasligi: formData.ilanBasligi,
+        hayvanIsmi: formData.hayvanIsmi,
+        cinsiyet: formData.cinsiyet,
+        rengi: formData.rengi,
+        turu: formData.turu,
+        kaybolduguIl: formData.kaybolduguIl,
+        kayipTarihi: formData.kayipTarihi,
+        ilanAciklamasi: formData.ilanAciklamasi,
+        resim: formData.resim, // Base64 string kaydediliyor
+        ad: formData.ad,
+        soyad: formData.soyad,
+        telefon: formData.telefon,
+      });
 
+      console.log("Yeni ilan Firestore'a kaydedildi: ", docRef.id);
       setShowModal(true);
       setTimeout(() => {
         setShowModal(false);
         navigate("/kayiplar");
       }, 5000);
     } catch (err) {
-      // Hataları nesne olarak al
-      err.inner.forEach((error) => {
-        newFormErrors[error.path] = error.message; // Hata mesajlarını formErrors'a ekliyoruz
-      });
+      // Doğrulama hatalarını yakala
+      const newFormErrors = {};
+      if (err?.inner?.length) {
+        err.inner.forEach((error) => {
+          newFormErrors[error.path] = error.message;
+        });
+      } else {
+        newFormErrors.general = "Beklenmedik bir hata oluştu, lütfen tekrar deneyin.";
+      }
 
-      setFormErrors(newFormErrors); // Yeni hataları state'e set ediyoruz
+      setFormErrors(newFormErrors);
     }
   };
-
-  const citys = [
-    "Adana",
-    "Adıyaman",
-    "Afyonkarahisar",
-    "Aksaray",
-    "Amasya",
-    "Ankara",
-    "Antalya",
-    "Ardahan",
-    "Artvin",
-    "Aydın",
-    "Balıkesir",
-    "Bartın",
-    "Batman",
-    "Bayburt",
-    "Bilecik",
-    "Bingöl",
-    "Bitlis",
-    "Bolu",
-    "Burdur",
-    "Bursa",
-    "Çanakkale",
-    "Çankırı",
-    "Çorum",
-    "Denizli",
-    "Diyarbakır",
-    "Düzce",
-    "Edirne",
-    "Elazığ",
-    "Erzincan",
-    "Erzurum",
-    "Eskişehir",
-    "Gaziantep",
-    "Giresun",
-    "Gümüşhane",
-    "Hakkâri",
-    "Hatay",
-    "Iğdır",
-    "Isparta",
-    "İstanbul",
-    "İzmir",
-    "Kahramanmaraş",
-    "Karabük",
-    "Karaman",
-    "Kastamonu",
-    "Kayseri",
-    "Kırıkkale",
-    "Kırklareli",
-    "Kırşehir",
-    "Kocaeli",
-    "Konya",
-    "Kütahya",
-    "Malatya",
-    "Manisa",
-    "Mardin",
-    "Mersin",
-    "Muğla",
-    "Muş",
-    "Nevşehir",
-    "Niğde",
-    "Ordu",
-    "Osmaniye",
-    "Rize",
-    "Sakarya",
-    "Samsun",
-    "Siirt",
-    "Sinop",
-    "Sivas",
-    "Şanlıurfa",
-    "Şırnak",
-    "Tekirdağ",
-    "Tokat",
-    "Trabzon",
-    "Tunceli",
-    "Uşak",
-    "Van",
-    "Yalova",
-    "Yozgat",
-    "Zonguldak",
-  ];
 
   return (
     <div>
@@ -252,12 +282,16 @@ const Form = () => {
           <div className="flex flex-col w-[80%]">
             <label className="font-bold my-2">Kaybolduğu İl</label>
             <select name="kaybolduguIl" onChange={handleChange} className="p-2 border-2 rounded-md">
+              <option value="">Seçiniz</option>
               {citys.map((city, index) => (
                 <option key={index} value={city}>
                   {city}
                 </option>
               ))}
             </select>
+            {formErrors.kaybolduguIl && (
+              <p className="text-red-500 text-sm">{formErrors.kaybolduguIl}</p>
+            )}
           </div>
 
           <div className="flex flex-col w-[80%]">
@@ -347,9 +381,11 @@ const Form = () => {
           {formErrors.telefon && <p className="text-red-500 text-sm">{formErrors.telefon}</p>}
         </div>
 
-        <button type="submit" className="w-100 h-10 mt-5 p-2 rounded-md bg-[#ff8a65] text-white">
-          KAYDET
-        </button>
+        <div className="flex justify-center w-[80%] mt-4">
+          <button type="submit" className="w-full py-2 bg-[#31511E] text-white rounded-md">
+            İlanı Gönder
+          </button>
+        </div>
       </form>
 
       {showModal && (
@@ -380,5 +416,4 @@ const Form = () => {
     </div>
   );
 };
-
 export default Form;

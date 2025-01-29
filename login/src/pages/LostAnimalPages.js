@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import AnimalCard from "../components/AnimalCard";
 import ExampleLostAnimals from "../components/ExampleLostAnimals";
+import { db } from "../firebase"; // Import your Firebase configuration (make sure you've set it up)
+import { collection, getDocs } from "firebase/firestore"; // Firestore functions
 
 const KayıpSayfası = () => {
   const [lost, setLost] = useState([]);
@@ -18,13 +20,22 @@ const KayıpSayfası = () => {
   };
 
   useEffect(() => {
-    // localStorage'dan kaybolan ilanları al
-    const savedLost = JSON.parse(localStorage.getItem("kayipIlanlari")) || [];
-    setLost(savedLost);
+    // Fetch lost animals from Firebase Firestore
+    const fetchLostAnimals = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "kayipIlanlari"));
+        const animals = querySnapshot.docs.map((doc) => doc.data());
+        setLost(animals);
+      } catch (error) {
+        console.error("Error fetching lost animals:", error);
+      }
+    };
+
+    fetchLostAnimals();
   }, []);
 
   return (
-    <div className="p-4 mt-28 mx-28">
+    <div className="p-4 mt-28 mx-28 ">
       <ExampleLostAnimals openModal={openModal} closeModal={closeModal} />
       {lost.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -65,7 +76,7 @@ const KayıpSayfası = () => {
               alt={selectedAnimal.hayvanIsmi}
               className="w-full h-40 object-cover rounded-md"
             />
-            <h3 className="text-2xl font-bold text-center mt-2">{selectedAnimal.ilanBasligi}</h3>
+            <h3 className="text-2xl font-bold text-center mt-2 ">{selectedAnimal.ilanBasligi}</h3>
             <div className="mt-4 text-gray-700 space-y-2">
               <p>
                 <strong>Hayvan İsmi:</strong> {selectedAnimal.hayvanIsmi}

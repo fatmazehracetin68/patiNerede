@@ -1,6 +1,6 @@
 import React from "react";
-import Form from "../components/Form";
 import backgroundImage from "../assest/background.jpeg";
+import Form from "../components/Form";
 
 const FormLostAnimal = () => {
   return (
