@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AnimalCard from "./AnimalCard";
 import blackCat from "../assest/black-cat.webp";
 import boncuk from "../assest/boncuk.jpeg";
@@ -7,6 +7,18 @@ import dumanCat from "../assest/dumanCat.jpeg";
 import { useNavigate } from "react-router-dom";
 
 const HomeReturn = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAnimal, setSelectedAnimal] = useState(null);
+
+  const openModal = (animal) => {
+    setSelectedAnimal(animal);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedAnimal(null);
+    setIsModalOpen(false);
+  };
   const navigate = useNavigate();
   const animals = [
     {
@@ -81,8 +93,62 @@ const HomeReturn = () => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-5">
           {animals.map((animal) => (
-            <AnimalCard key={animal.id} animal={animal} isFound={true} />
+            <AnimalCard
+              key={animal.id}
+              animal={animal}
+              isFound={true}
+              openModal={() => openModal(animal)}
+              closeModal={closeModal}
+            />
           ))}
+          {/* Modal */}
+          {isModalOpen && selectedAnimal && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
+              <div className="bg-white p-6 rounded-lg shadow-lg w-80 relative">
+                <button
+                  className="absolute top-2 right-2 text-gray-600 hover:text-black"
+                  onClick={closeModal} // Modal'ı kapatmak için
+                >
+                  ✖
+                </button>
+
+                <img
+                  src={selectedAnimal.resim}
+                  alt={selectedAnimal.hayvanIsmi}
+                  className="w-full h-40 object-cover rounded-md"
+                />
+                <h3 className="text-2xl font-bold text-center mt-2">
+                  {selectedAnimal.ilanBasligi}
+                </h3>
+                <div className="mt-4 text-gray-700 space-y-2">
+                  <p>
+                    <strong>Hayvan İsmi:</strong> {selectedAnimal.hayvanIsmi}
+                  </p>
+                  <p>
+                    <strong>Cinsiyet:</strong> {selectedAnimal.cinsiyet}
+                  </p>
+                  <p>
+                    <strong>Tür:</strong> {selectedAnimal.turu}
+                  </p>
+                  <p>
+                    <strong>Kaybolduğu İl:</strong> {selectedAnimal.kaybolduguIl}
+                  </p>
+                  <p>
+                    <strong>Kayıp Tarihi:</strong> {selectedAnimal.kayipTarihi}
+                  </p>
+                  <p>
+                    <strong>Açıklama:</strong> {selectedAnimal.ilanAciklamasi}
+                  </p>
+                  <p>
+                    <strong>Sahibi:</strong> {selectedAnimal.ad} {selectedAnimal.soyad}
+                  </p>
+                  <p>
+                    <strong>Telefon:</strong> {selectedAnimal.telefon}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className=" flex justify-center">
