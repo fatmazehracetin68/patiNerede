@@ -100,14 +100,33 @@ const ExampleLostAnimals = ({ openModal, isModalOpen, selectedAnimal, closeModal
               alt={selectedAnimal.hayvanIsmi}
               className="w-full h-40 object-cover rounded-md"
             />
-            <h3 className="text-2xl font-bold text-center mt-2">{selectedAnimal.hayvanIsmi}</h3>
-            <p className="text-center text-gray-700">{selectedAnimal.kaybolduguIl}</p>
-            <p className="mt-2 text-sm text-gray-600">{selectedAnimal.ilanAciklamasi}</p>
-            <p className="mt-2 text-sm text-gray-600">Telefon: {selectedAnimal.telefon}</p>
-            <p className="mt-2 text-sm text-gray-600">Cinsiyet: {selectedAnimal.cinsiyet}</p>
-            <p className="mt-2 text-sm text-gray-600">
-              Sahibi: {selectedAnimal.ad} {selectedAnimal.soyad}
-            </p>
+            <h3 className="text-2xl font-bold text-center mt-2">{selectedAnimal.ilanBasligi}</h3>
+            <div className="mt-4 text-gray-700 space-y-2">
+              <p>
+                <strong>Hayvan İsmi:</strong> {selectedAnimal.hayvanIsmi}
+              </p>
+              <p>
+                <strong>Cinsiyet:</strong> {selectedAnimal.cinsiyet}
+              </p>
+              <p>
+                <strong>Tür:</strong> {selectedAnimal.turu}
+              </p>
+              <p>
+                <strong>Kaybolduğu İl:</strong> {selectedAnimal.kaybolduguIl}
+              </p>
+              <p>
+                <strong>Kayıp Tarihi:</strong> {selectedAnimal.kayipTarihi}
+              </p>
+              <p>
+                <strong>Açıklama:</strong> {selectedAnimal.ilanAciklamasi}
+              </p>
+              <p>
+                <strong>Sahibi:</strong> {selectedAnimal.ad} {selectedAnimal.soyad}
+              </p>
+              <p>
+                <strong>Telefon:</strong> {selectedAnimal.telefon}
+              </p>
+            </div>
           </div>
         </div>
       )}

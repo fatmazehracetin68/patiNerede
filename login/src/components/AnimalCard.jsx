@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 
-const AnimalCard = ({ animal, isModalOpen, closeModal, openModal }) => {
+const AnimalCard = ({ animal, isModalOpen, closeModal, openModal, isFound }) => {
   return (
     <>
       <div
         className="w-48 h-56 my-5 rounded-md bg-[#1A1A19] overflow-hidden mx-auto cursor-pointer relative"
         onClick={openModal}
       >
-        {animal.isFound && (
+        {isFound && (
           <div className="absolute top-3 -left-4 -rotate-45 bg-[#FF8A65] text-white text-lg font-bold px-4 py-1 rounded-lg z-10">
             Bulundu
           </div>

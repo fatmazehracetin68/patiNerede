@@ -85,6 +85,12 @@ const KayıpSayfası = () => {
               <p>
                 <strong>Açıklama:</strong> {selectedAnimal.ilanAciklamasi}
               </p>
+              <p>
+                <strong>Sahibi:</strong> {selectedAnimal.ad} {selectedAnimal.soyad}
+              </p>
+              <p>
+                <strong>Telefon:</strong> {selectedAnimal.telefon}
+              </p>
             </div>
           </div>
         </div>
