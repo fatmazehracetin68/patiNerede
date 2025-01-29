@@ -13,7 +13,7 @@ export const App = () => {
     <Router>
       <Header />
       <Routes>
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="/form-lost-animal" element={<FormLostAnimal />} />
         <Route path="/finding-animal-form" element={<FindingAnimalForm />} />
         <Route path="/lost-animals" element={<LostAnimalPages />} />
