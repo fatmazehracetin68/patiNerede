@@ -153,7 +153,7 @@ const HomeReturn = () => {
 
         <div className=" flex justify-center">
           <button
-            onClick={() => navigate("/found-animals")}
+            onClick={() => navigate("/homeReturn-aimals")}
             className="bg-[#F6FCDF] w-52 h-10 rounded-md "
           >
             Hepsini Göster

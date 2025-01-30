@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import AnimalCard from "../components/AnimalCard";
-import ExampleLostAnimals from "../components/ExampleLostAnimals";
-import { db } from "../firebase"; // Import your Firebase configuration (make sure you've set it up)
-import { collection, getDocs } from "firebase/firestore"; // Firestore functions
+
+import { db } from "../firebase";
+import { collection, getDocs } from "firebase/firestore";
 import { Pet } from "iconsax-react";
 
-const KayıpSayfası = () => {
+const FindingAnimal = () => {
   const [lost, setLost] = useState([]);
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,9 +22,9 @@ const KayıpSayfası = () => {
 
   useEffect(() => {
     // Fetch lost animals from Firebase Firestore
-    const fetchLostAnimals = async () => {
+    const findingAnimals = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "kayipIlanlari"));
+        const querySnapshot = await getDocs(collection(db, "bulunanHayvanlar"));
         const animals = querySnapshot.docs.map((doc) => doc.data());
         setLost(animals);
       } catch (error) {
@@ -32,18 +32,18 @@ const KayıpSayfası = () => {
       }
     };
 
-    fetchLostAnimals();
+    findingAnimals();
   }, []);
-
   return (
     <div className="p-4 mt-28 md:mx-20 lg:mx-32 xl:mx-48">
       <div className=" my-5 flex items-start space-x-2">
         <Pet size="28" color="#37d67a" />
         <h1 className="mt-1">
-          Sahiplerinin kaybettiği ve kavuşmak istediği hayvanlar burada listelenmektedir.
+          Duyarlı vatandaşlar tarafından bulunan ve sahibine kavuşturulmak istenen hayvanlar burada
+          listelenmektedir.
         </h1>
       </div>
-      <ExampleLostAnimals openModal={openModal} closeModal={closeModal} />
+
       {lost.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center">
           {lost.map((ilan, index) => (
@@ -111,4 +111,4 @@ const KayıpSayfası = () => {
   );
 };
 
-export default KayıpSayfası;
+export default FindingAnimal;

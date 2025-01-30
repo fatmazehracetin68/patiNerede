@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import { getApp } from "firebase/app";
 
 const citys = [
   "Adana",
@@ -87,7 +85,7 @@ const citys = [
   "Zonguldak",
 ];
 
-const Form = () => {
+const Form = ({ pageType }) => {
   const schema = yup.object().shape({
     ilanBasligi: yup.string().required("İlan başlığı zorunludur"),
     kaybolduguIl: yup.string().required("Kaybolduğu il zorunludur"),
@@ -158,11 +156,12 @@ const Form = () => {
     e.preventDefault();
 
     try {
+      const collectionName = pageType === "lostAnimal" ? "kayipIlanlari" : "bulunanHayvanlar";
       // Form verilerini doğrula
       await schema.validate(formData, { abortEarly: false });
 
       // Firestore'a kaydet
-      const docRef = await addDoc(collection(db, "kayipIlanlari"), {
+      const docRef = await addDoc(collection(db, collectionName), {
         ilanBasligi: formData.ilanBasligi,
         hayvanIsmi: formData.hayvanIsmi,
         cinsiyet: formData.cinsiyet,
@@ -181,7 +180,7 @@ const Form = () => {
       setShowModal(true);
       setTimeout(() => {
         setShowModal(false);
-        navigate("/kayiplar");
+        navigate(pageType === "lostAnimal" ? "/lost-animals" : "/finding-animal");
       }, 5000);
     } catch (err) {
       // Doğrulama hatalarını yakala
@@ -395,7 +394,7 @@ const Form = () => {
             <p className="text-gray-600 mt-2">İlanınız başarıyla kaydedildi.</p>
             <button
               onClick={() => {
-                navigate("/kayiplar");
+                navigate("/finding-animal");
               }}
               className="mt-4 bg-[#ff8a65] text-white px-4 py-2 rounded-md"
             >

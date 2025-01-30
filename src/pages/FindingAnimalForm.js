@@ -22,7 +22,7 @@ const FindingAnimalForm = () => {
             Lütfen, kedi, köpek gibi kaybolan evcil hayvanınıza ait bilgileri detaylı olarak ilgili
             alanlara giriniz.
           </h3>
-          <Form />
+          <Form pageType="findingAnimal" />
         </div>
       </div>
     </div>

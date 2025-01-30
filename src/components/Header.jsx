@@ -7,7 +7,8 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const titleLinks = [
     { label: "KAYIPLAR", path: "/lost-animals" },
-    { label: "YUVASINA KAVUŞANLAR", path: "/found-animals" },
+    { label: "BULUNAN HAYVANLAR", path: "/finding-animal" },
+    { label: "YUVASINA KAVUŞANLAR", path: "homeReturn-aimals" },
     { label: "KAYBIM VAR", path: "/form-lost-animal" },
     { label: "KAYIP BULDUM", path: "/finding-animal-form" },
   ];

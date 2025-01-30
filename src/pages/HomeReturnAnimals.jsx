@@ -5,7 +5,7 @@ import dumanCat from "../assest/dumanCat.jpeg";
 import sakir from "../assest/sakir.jpeg";
 import AnimalCard from "../components/AnimalCard";
 
-const FoundAnimals = () => {
+const HomeReturnAnimals = () => {
   const animals = [
     {
       ilanBasligi: "Kara Kayboldu",
@@ -97,4 +97,4 @@ const FoundAnimals = () => {
   );
 };
 
-export default FoundAnimals;
+export default HomeReturnAnimals;
