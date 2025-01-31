@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import AnimalCard from "../components/AnimalCard";
 import ExampleLostAnimals from "../components/ExampleLostAnimals";
-import { db } from "../firebase"; // Import your Firebase configuration (make sure you've set it up)
-import { collection, getDocs } from "firebase/firestore"; // Firestore functions
+import { db } from "../firebase";
+import { collection, getDocs } from "firebase/firestore";
 import { Pet } from "iconsax-react";
 
 const KayıpSayfası = () => {
@@ -21,7 +21,6 @@ const KayıpSayfası = () => {
   };
 
   useEffect(() => {
-    // Fetch lost animals from Firebase Firestore
     const fetchLostAnimals = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "kayipIlanlari"));
@@ -36,7 +35,7 @@ const KayıpSayfası = () => {
   }, []);
 
   return (
-    <div className="p-4 mt-28 md:mx-20 lg:mx-32 xl:mx-48">
+    <div className="p-4 my-28 md:mx-20 lg:mx-32 xl:mx-48">
       <div className=" my-5 flex items-start space-x-2">
         <Pet size="28" color="#37d67a" />
         <h1 className="mt-1">
@@ -92,7 +91,10 @@ const KayıpSayfası = () => {
                 <strong>Kaybolduğu İl:</strong> {selectedAnimal.kaybolduguIl}
               </p>
               <p>
-                <strong>Kayıp Tarihi:</strong> {selectedAnimal.kayipTarihi}
+                <strong>Kayıp Tarihi:</strong>{" "}
+                {selectedAnimal.kayipTarihi
+                  ? new Date(selectedAnimal.kayipTarihi.seconds * 1000).toLocaleDateString("tr-TR")
+                  : "Bilinmiyor"}
               </p>
               <p>
                 <strong>Açıklama:</strong> {selectedAnimal.ilanAciklamasi}

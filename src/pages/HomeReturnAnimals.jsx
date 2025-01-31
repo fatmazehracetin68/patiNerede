@@ -1,100 +1,102 @@
-import blackCat from "../assest/black-cat.webp";
-import boncuk from "../assest/boncuk.jpeg";
-import max from "../assest/max.webp";
-import dumanCat from "../assest/dumanCat.jpeg";
-import sakir from "../assest/sakir.jpeg";
 import AnimalCard from "../components/AnimalCard";
+import React, { useEffect, useState } from "react";
+import { db } from "../firebase";
+import { collection, getDocs } from "firebase/firestore";
+import { Pet } from "iconsax-react";
 
 const HomeReturnAnimals = () => {
-  const animals = [
-    {
-      ilanBasligi: "Kara Kayboldu",
-      hayvanIsmi: "Kara",
-      cinsiyet: "Dişi",
-      rengi: "Siyah",
-      turu: "kedi",
-      kaybolduguIl: "İstanbul",
-      kayipTarihi: "2025-01-10",
-      ilanAciklamasi: "Kara, siyah tüyleriyle tanınır. Bir hafta önce evden kayboldu.",
-      resim: blackCat,
-      ad: "Ahmet",
-      soyad: "Yılmaz",
-      telefon: "0532XXXXXXX",
-      id: 1,
-    },
-    {
-      ilanBasligi: "Beyaz Kedi Kayboldu",
-      hayvanIsmi: "Boncuk",
-      cinsiyet: "Erkek",
-      rengi: "Beyaz",
-      turu: "köpek",
-      kaybolduguIl: "Ankara",
-      kayipTarihi: "2025-01-15",
-      ilanAciklamasi:
-        "Beyaz, kıvırcık tüylü ve çok sakin bir köpektir. Çiftlik evimizden kayboldu.",
-      resim: boncuk,
-      ad: "Merve",
-      soyad: "Kaya",
-      telefon: "0543XXXXXXX",
-      id: 2,
-    },
-    {
-      ilanBasligi: "Max Kayboldu",
-      hayvanIsmi: "Max",
-      cinsiyet: "Dişi",
-      rengi: "Kumral",
-      turu: "köpek",
-      kaybolduguIl: "İzmir",
-      kayipTarihi: "2025-01-12",
-      ilanAciklamasi:
-        "max, evde çok sevilen ve her zaman etrafımızda olan bir köpekti. Çalışmaya giderken kayboldu.",
-      resim: max,
-      ad: "Mehmet",
-      soyad: "Demir",
-      telefon: "0551XXXXXXX",
-      id: 3,
-    },
+  const [adopted, setAdopted] = useState([]);
+  const [selectedAnimal, setSelectedAnimal] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-    {
-      ilanBasligi: "Gümüş Kedi Kayboldu",
-      hayvanIsmi: "Gümüş",
-      cinsiyet: "Erkek",
-      rengi: "Gümüş gri",
-      turu: "kedi",
-      kaybolduguIl: "Bursa",
-      kayipTarihi: "2025-01-20",
-      ilanAciklamasi: "Gümüş, bahçede oynarken kayboldu. Yavru kedi, çok arkadaş canlısıdır.",
-      resim: dumanCat,
-      ad: "Selin",
-      soyad: "Çelik",
-      telefon: "0553XXXXXXX",
-      id: 4,
-    },
-    {
-      ilanBasligi: "Papağanımız Kayboldu",
-      hayvanIsmi: "Şakir",
-      cinsiyet: "Erkek",
-      rengi: "Limon sarı",
-      turu: "kanatlı",
-      kaybolduguIl: "Aksaray",
-      kayipTarihi: "2025-01-20",
-      ilanAciklamasi: "Cam açıkken kaçtı, ismini biliyor seslenince bakar.",
-      resim: sakir,
-      ad: "Fatma",
-      soyad: "Çetin",
-      telefon: "05531234567",
-      id: 5,
-    },
-  ];
+  useEffect(() => {
+    const fetchHomeReturn = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "yuvasinaKavusanlar"));
+        const animals = querySnapshot.docs.map((doc) => doc.data());
+        setAdopted(animals);
+      } catch (error) {
+        console.error("Error fetching adopted animals:", error);
+      }
+    };
+
+    fetchHomeReturn();
+  }, []);
+
   return (
-    <div className="mt-36 mx-36">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ">
-        {animals.map((animal) => (
-          <AnimalCard key={animal.id} animal={animal} isFound={true} />
-        ))}
+    <div className="p-4 my-28 md:mx-20 lg:mx-32 xl:mx-48">
+      <div className="my-5 flex items-start space-x-2">
+        <Pet size="28" color="#37d67a" />
+        <h1 className="mt-1">Yuvasına kavuşan hayvanlar burada listelenmektedir.</h1>
       </div>
+
+      {adopted.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center">
+          {adopted.map((ilan, index) => (
+            <div
+              key={index}
+              onClick={() => {
+                setSelectedAnimal(ilan);
+                setIsModalOpen(true);
+              }}
+            >
+              <AnimalCard animal={ilan} isFound={true} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-center text-gray-500">Yuvasına kavuşan hayvan bulunmamaktadır.</p>
+      )}
+
+      {isModalOpen && selectedAnimal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md relative">
+            <button
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+              onClick={() => setIsModalOpen(false)}
+            >
+              ✖
+            </button>
+
+            <img
+              src={selectedAnimal.resim}
+              alt={selectedAnimal.hayvanIsmi}
+              className="w-full h-40 object-cover rounded-md "
+            />
+            <h3 className="text-2xl font-bold text-center mt-2 ">{selectedAnimal.ilanBasligi}</h3>
+            <div className="mt-4 text-gray-700 space-y-2">
+              <p>
+                <strong>Hayvan İsmi:</strong> {selectedAnimal.hayvanIsmi}
+              </p>
+              <p>
+                <strong>Cinsiyet:</strong> {selectedAnimal.cinsiyet}
+              </p>
+              <p>
+                <strong>Tür:</strong> {selectedAnimal.turu}
+              </p>
+              <p>
+                <strong>Kaybolduğu İl:</strong> {selectedAnimal.kaybolduguIl}
+              </p>
+              <p>
+                <strong>Kayıp Tarihi:</strong>{" "}
+                {selectedAnimal.kayipTarihi
+                  ? new Date(selectedAnimal.kayipTarihi.seconds * 1000).toLocaleDateString("tr-TR")
+                  : "Bilinmiyor"}
+              </p>
+              <p>
+                <strong>Açıklama:</strong> {selectedAnimal.ilanAciklamasi}
+              </p>
+              <p>
+                <strong>Sahibi:</strong> {selectedAnimal.ad} {selectedAnimal.soyad}
+              </p>
+              <p>
+                <strong>Telefon:</strong> {selectedAnimal.telefon}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
 export default HomeReturnAnimals;

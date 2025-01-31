@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase";
+import { Timestamp } from "firebase/firestore";
 
 const citys = [
   "Adana",
@@ -160,7 +161,6 @@ const Form = ({ pageType }) => {
       // Form verilerini doğrula
       await schema.validate(formData, { abortEarly: false });
 
-      // Firestore'a kaydet
       const docRef = await addDoc(collection(db, collectionName), {
         ilanBasligi: formData.ilanBasligi,
         hayvanIsmi: formData.hayvanIsmi,
@@ -168,9 +168,9 @@ const Form = ({ pageType }) => {
         rengi: formData.rengi,
         turu: formData.turu,
         kaybolduguIl: formData.kaybolduguIl,
-        kayipTarihi: formData.kayipTarihi,
+        kayipTarihi: Timestamp.fromDate(new Date(formData.kayipTarihi)),
         ilanAciklamasi: formData.ilanAciklamasi,
-        resim: formData.resim, // Base64 string kaydediliyor
+        resim: formData.resim,
         ad: formData.ad,
         soyad: formData.soyad,
         telefon: formData.telefon,
@@ -183,7 +183,6 @@ const Form = ({ pageType }) => {
         navigate(pageType === "lostAnimal" ? "/lost-animals" : "/finding-animal");
       }, 5000);
     } catch (err) {
-      // Doğrulama hatalarını yakala
       const newFormErrors = {};
       if (err?.inner?.length) {
         err.inner.forEach((error) => {
